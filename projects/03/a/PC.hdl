@@ -11,10 +11,22 @@
  * else                    out[t+1] = out[t]
  */
 
+//TODO: come back to this & diagram it out visually..this is confusing still
 CHIP PC {
     IN in[16],load,inc,reset;
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Inc16(in=outd, out=outi);
+
+    // load incremented value or input
+    Mux16(a=outi, b=in, sel=load, out=l);
+    // load a value of reset register
+    Mux16(a=l, b=false, sel=reset, out=rin);
+
+    // determine if load bit should be set
+    Or(a=reset, b=load, out=lr);
+    Or(a=lr, b=inc, out=lri);
+
+    Register(in=rin, load=lri, out=out, out=outd);
 }

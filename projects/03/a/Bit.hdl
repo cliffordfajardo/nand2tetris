@@ -13,14 +13,14 @@
 // Even though the book talks about the clock input, it's not mentioned in his chip..the clock input is inferred since its composed of a dff  https://goo.gl/VV1DnZ
 
 // | time | in  |load | out |
-// | 0+   |  0  |  0  |  0  | //tock
-// | 1    |  0  |  0  |  0  | //tick ------|
-// | 1+   |  0  |  1  |  0  | //tock       |
-// | 2    |  0  |  1  |  0  | //tick-------|
-// | 2+   |  1  |  0  |  0  | //tock
-// | 3    |  1  |  0  |  0  | //tick
-// | 3+   |  1  |  1  |  0  | //tock
-// | 4    |  1  |  1  |  1  | //tick
+// | 0+   |  0  |  0  |  0  | //tick
+// | 1    |  0  |  0  |  0  | //tock ------|
+// | 1+   |  0  |  1  |  0  | //tick       |
+// | 2    |  0  |  1  |  0  | //tock-------|
+// | 2+   |  1  |  0  |  0  | //tick
+// | 3    |  1  |  0  |  0  | //tock
+// | 3+   |  1  |  1  |  0  | //tick
+// | 4    |  1  |  1  |  1  | //tock <--values change
 
 CHIP Bit {
     IN in,      // a data bit

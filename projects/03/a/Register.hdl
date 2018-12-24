@@ -9,10 +9,66 @@
  * else out does not change
  */
 
+//Several latches(Bits) can be combined in parallel to form a register
 CHIP Register {
-    IN in[16], load;
-    OUT out[16];
+    IN in[16], 
+       load; // if write is enabled, use the new incoming value. Otherwise use the input from the last time period.
+    OUT out[16]; //out always emits the current state of register
+                //so if we just look at the out value of a register, we know what value is stored there
 
     PARTS:
-    // Put your code here:
+    Bit(in=in[0], load=load, out=out[0]);
+    Bit(in=in[1], load=load, out=out[1]);
+    Bit(in=in[2], load=load, out=out[2]);
+    Bit(in=in[3], load=load, out=out[3]);
+    Bit(in=in[4], load=load, out=out[4]);
+    Bit(in=in[5], load=load, out=out[5]);
+    Bit(in=in[6], load=load, out=out[6]);
+    Bit(in=in[7], load=load, out=out[7]);
+    Bit(in=in[8], load=load, out=out[8]);
+    Bit(in=in[9], load=load, out=out[9]);
+    Bit(in=in[10], load=load, out=out[10]);
+    Bit(in=in[11], load=load, out=out[11]);
+    Bit(in=in[12], load=load, out=out[12]);
+    Bit(in=in[13], load=load, out=out[13]);
+    Bit(in=in[14], load=load, out=out[14]);
+    Bit(in=in[15], load=load, out=out[15]);
 }
+
+
+
+//      Register Usage Example
+//
+//  Nothing happens since 'load' is not enabled. Output remains the same
+//  0            _____________
+// in-----------|            |
+//              |            |       0
+//  0           |            |------out
+// load---------|____________|
+
+
+
+//  Since 'load' is off, we can save our new value.
+//  1            _____________________
+// in-----------|'in' value 1 is saved |
+//              |                      |       0
+//  0           |                      |------out
+// load---------|______________________|
+
+
+
+//  Since 'load' is on and we have a value, we can write. Value is saved in the register and also the value outputted is 1
+//  1            _____________________
+// in-----------|'in' value 1 is saved |
+//              |                      |       1
+//  1           |                      |------out
+// load---------|______________________|
+
+
+
+//  Since 'load' is on and we have a value, we can write. Value is saved in the register and also the value outputted is 1
+//  0            _____________________
+// in-----------|'in' value 0 is saved |
+//              |                      |       0
+//  1           |                      |------out
+// load---------|______________________|

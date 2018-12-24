@@ -9,11 +9,78 @@
  * the in value is loaded into the memory location specified by address 
  * (the loaded value will be emitted to out from the next time step onward).
  */
-
+ //TODO: come back to this & diagram it out visually..this is confusing still
+//10:34 video3.3 talks about clock cycles 
 CHIP RAM8 {
-    IN in[16], load, address[3];
-    OUT out[16];
+    IN in[16],      // the data to be inserted (a bit value) //[x...x]
+       load,        // if load, then the 'in' loaded into the memory location specified by address 
+       address[3];  // the address to write the incoming `in` to.
+    OUT out[16];    // the value at the memory location we specified by address
 
     PARTS:
-    // Put your code here:
+   //*******************Choose which register gets loaded*******************
+    DMux8Way(
+        in=load, 
+        sel=address, 
+        a=l0, 
+        b=l1, 
+        c=l2, 
+        d=l3, 
+        e=l4, 
+        f=l5, 
+        g=l6, 
+        h=l7);
+    
+
+    Register(in=in, load=l0, out=stateFromRegister0);
+    Register(in=in, load=l1, out=stateFromRegister1);
+    Register(in=in, load=l2, out=stateFromRegister2);
+    Register(in=in, load=l3, out=stateFromRegister3);
+    Register(in=in, load=l4, out=stateFromRegister4);
+    Register(in=in, load=l5, out=stateFromRegister5);
+    Register(in=in, load=l6, out=stateFromRegister6);
+    Register(in=in, load=l7, out=stateFromRegister7);
+    // At this point, our RAM sels are populated (if load is enabled)
+
+ 
+
+    //**************Choose which register gets outputted from RAM*******************
+    // Pass the the current state of each register to Mux8...
+        //we're given a 'address', so let's select the value that address matches the address we passed in.
+    Mux8Way16(
+            a=stateFromRegister0, 
+            b=stateFromRegister1,  
+            c=stateFromRegister2,  
+            d=stateFromRegister3,  
+            e=stateFromRegister4,  
+            f=stateFromRegister5,  
+            g=stateFromRegister6,   
+            h=stateFromRegister7,
+            sel=address,
+            out=out); 
 }
+
+
+//-Mux8Way16-
+//a[16]---------#
+//b[16]---------#  #
+//c[16]---------#    #
+//d[16]---------#      # ---out[16]
+//e[16]---------#      #
+//f[16]---------#    #
+//g[16]---------#  #
+//h[16]---------# |
+//                |
+//               sel
+
+//-DMux8Way-
+//                 ##---------a[16]
+//               #  #---------b[16]
+//             #    #---------c[16]
+//  in[16]--#       #---------d[16]
+//            #     #---------e[16]
+//             #    #---------f[16]
+//               #  #---------g[16]
+//               | # ---------h[16]
+//               |
+//              sel
