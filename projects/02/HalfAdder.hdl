@@ -1,0 +1,36 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/HalfAdder.hdl
+
+
+//NOTE:
+//After looking at `HalfAdder.cmp` I noticed
+//that this solution/truth table looks like
+//one of the previous gates we implemented.
+
+//Xor truth table
+// |   a   |   b   |  sum  | carry |
+// |   0   |   0   |   0   |   0   |
+// |   0   |   1   |   1   |   0   |
+// |   1   |   0   |   1   |   0   |
+// |   1   |   1   |   0   |   1   |
+
+// The first 3 cases are covered by Xor
+// The last case 1+1 is sort of..we get the
+// sum 0..good...but carry is 1. How do I represent
+// that in my chip?
+
+/**
+ * Computes the sum of two bits.
+ */
+
+CHIP HalfAdder {
+    IN a, b;    // 1-bit inputs       (Ex: 1+1)  
+    OUT sum,    // Right bit of a + b (what is meant by this is.. 1+1 -> 0 .. in base 2 world)
+        carry;  // Left bit of a + b  (what is meant by this is... 1 + 1 -> 10) ..carry is the left most bit of the add result
+
+    PARTS:
+    Xor(a=a, b=b, out=sum); //Sum=Xor(1,1)->0  Carry=AND(1,1)->
+    And(a=a, b=b ,out=carry);
+}

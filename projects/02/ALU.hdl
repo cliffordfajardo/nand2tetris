@@ -1,0 +1,91 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ALU.hdl
+
+/**
+ * The ALU (Arithmetic Logic Unit).
+ * Computes one of the following functions:
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * according to 6 input bits denoted zx,nx,zy,ny,f,no.
+ * In addition, the ALU computes two 1-bit outputs:
+ * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
+ * if the ALU output < 0, ng is set to 1; otherwise ng is set to 0.
+ */
+
+// Implementation: the ALU logic manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) set x = 0        // 16-bit constant
+// if (nx == 1) set x = !x       // bitwise not
+// if (zy == 1) set y = 0        // 16-bit constant
+// if (ny == 1) set y = !y       // bitwise not
+// if (f == 1)  set out = x + y  // integer 2's complement addition
+// if (f == 0)  set out = x & y  // bitwise and
+// if (no == 1) set out = !out   // bitwise not
+// if (out == 0) set zr = 1
+// if (out < 0) set ng = 1
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    PARTS:
+    //*************************X********************
+    //ZX start
+    Mux16(a=x, b=false, sel=zx, out=zxOut);
+    //ZX end
+   
+    //NX start
+    Not16(in=zxOut,out=flippedZX);                  //precompute potential NX value
+    Mux16(a=zxOut, b=flippedZX, sel=nx, out=nxOut);
+    //NX end
+
+
+
+    //*************************Y********************
+    //ZY start
+    Mux16(a=y, b=false, sel=zy, out=zyOut);
+    //ZY END
+
+    //NY start
+    Not16(in=zyOut, out=flippedNY);                 //precompute potential NY value
+    Mux16(a=zyOut, b=flippedNY, sel=ny, out=nyOut);
+    //NY end
+
+
+
+    //*************************F********************
+    //f start
+    Add16(a=nxOut, b=nyOut, out=xySum);             //precompute potential F value
+    And16(a=nxOut, b=nyOut, out=xyAndResult);       //precompute potential F value..bitwise AND on X & Y..compare each bit!
+    Mux16(a=xyAndResult, b=xySum, sel=f, out=fOut);
+    //f end
+
+    //*************************No********************
+    Not16(in=fOut, out=flippedFResult);      //precompute potential No value
+    Mux16(a=fOut, b=flippedFResult, sel=no, out[0..7]=noOut07, out[8..15]=noOut815, out[15]=ng, out=out); 
+
+
+
+    //*************************Zr********************
+    //ZR, determines whether a number is 0 or not. A number is only 0 if all bits in the sequence are 0.
+    //we'll need to determine if there are any 0's in the set of bits...
+    // also need to reduce down multiple bits into 1 bit...
+    Or8Way(in=noOut07,  out=firstHalfOut);
+    Or8Way(in=noOut815, out=secondHalfOut);
+    Or(a=firstHalfOut, b=secondHalfOut, out=outZr);
+    Not(in=outZr, out=zr); //If ZR=0, then we want to Not it to make it true.
+    
+}

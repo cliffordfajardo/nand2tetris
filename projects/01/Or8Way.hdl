@@ -1,0 +1,27 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/Or8Way.hdl
+// THIS IS A MULTI WAY VARIANT BUS
+/**
+ * 8-way Or: 
+ * out = (in[0] or in[1] or ... or in[7])
+ */
+//IN  _ _ _ _ _ _ _ _
+//OUT _
+CHIP Or8Way {
+    IN in[8]; 
+    OUT out;
+
+    PARTS:
+    Or(a=in[0], b=in[1], out=outOne);
+    Or(a=in[2], b=in[3], out=outTwo);
+    Or(a=in[4], b=in[5], out=outThree);
+    Or(a=in[6], b=in[7], out=outFour);
+    
+    
+    Or(a=outOne, b=outTwo, out=outResultOne);
+    Or(a=outThree, b=outFour, out=outResultTwo);
+    
+    Or(a=outResultOne, b=outResultTwo, out=out);
+}

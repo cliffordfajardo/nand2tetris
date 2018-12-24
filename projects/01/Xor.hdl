@@ -1,0 +1,26 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/Xor.hdl
+
+/**
+ * Exclusive-or gate:
+ * out = not (a == b)
+ */
+// Example API
+// returns 1 when both values are opposing
+// Xor(1,0) --> 1
+// Xor(0,0) --> 0
+// Xor(1,1) --> 0
+
+CHIP Xor {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    Not(in=a, out=notA); //invert each input value...
+    Not(in=b, out=notB);
+    And(a=notA, b=b, out=outAnd1); // use and with inverted value.
+    And(a=a, b=notB, out=outAnd2);
+    Or(a=outAnd1, b=outAnd2, out=out);
+}

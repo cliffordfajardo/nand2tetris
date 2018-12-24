@@ -1,0 +1,89 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/Bit.hdl
+
+/**
+ * 1-bit register:
+ * If load[t] == 1 then out[t+1] = in[t]
+ *                 else out does not change (out[t+1] = out[t])
+ */
+// Book notes:
+// Single register bit is only desined to store a 0 or 1
+// Even though the book talks about the clock input, it's not mentioned in his chip..the clock input is inferred since its composed of a dff  https://goo.gl/VV1DnZ
+
+// | time | in  |load | out |
+// | 0+   |  0  |  0  |  0  | //tock
+// | 1    |  0  |  0  |  0  | //tick ------|
+// | 1+   |  0  |  1  |  0  | //tock       |
+// | 2    |  0  |  1  |  0  | //tick-------|
+// | 2+   |  1  |  0  |  0  | //tock
+// | 3    |  1  |  0  |  0  | //tick
+// | 3+   |  1  |  1  |  0  | //tock
+// | 4    |  1  |  1  |  1  | //tick
+
+CHIP Bit {
+    IN in,      // a data bit
+    load;       // enables the cell for writes (I wish this was called 'enabled' instead)
+    OUT out;    // the current state of cell.
+
+    PARTS:
+    //DFF is a given sequential gate.
+    DFF(in=muxOutWhichIsTimeValue,               //by default 'in' of DFF (AKA current time) is given. Here I'm just calling the input time.
+        out=inputFromtimeMinus1,                 //by default it outputs
+        out=out);
+        
+    Mux(a=inputFromtimeMinus1, 
+        b=in, 
+        sel=load, // if write is enabled, use the new incoming value. Otherwise use the input from the last time period.
+        out=muxOutWhichIsTimeValue);
+
+
+}
+
+
+
+
+
+//Thank you CrachCourse YouTube video for the nice diagram FTW! https://www.youtube.com/watch?v=fpnE6UAfbtU
+//Now the darn table above is WAAAY easier to read...
+//      Bit Usage Example
+//
+//  Nothing happens since 'load' is not enabled. Output remains the same
+//  0            _____________
+// in-----------|            |
+//              |            |       0
+//  0           |            |------out
+// load---------|____________|
+
+
+
+//  Since 'load' is off, we can save our new value.
+//  1            _____________________
+// in-----------|'in' value 1 is saved |
+//              |                      |       0
+//  0           |                      |------out
+// load---------|______________________|
+
+
+
+//  Since 'load' is on and we have a value, we can write. Value is saved in the register and also the value outputted is 1
+//  1            _____________________
+// in-----------|'in' value 1 is saved |
+//              |                      |       1
+//  1           |                      |------out
+// load---------|______________________|
+
+
+
+//  Since 'load' is on and we have a value, we can write. Value is saved in the register and also the value outputted is 1
+//  0            _____________________
+// in-----------|'in' value 0 is saved |
+//              |                      |       0
+//  1           |                      |------out
+// load---------|______________________|
+
+
+
+// OK now to try and understand the notion of time in this section..I'm still trying to understand why each
+// second of time has a tick & tock cycle (0 -> 0+, 1 -> 1+, 2 -> 2+). We cant just do 0 1 2 ...
