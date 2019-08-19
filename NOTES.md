@@ -1,3 +1,5 @@
+TODO: use TSDX for the assembler portion of the projects
+
 From Nand to Tetris:
 
 **Boolean Functions and Gate Logic**
